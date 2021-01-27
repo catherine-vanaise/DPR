@@ -1,0 +1,258 @@
+---
+title: "Laboratory 2"
+author: "Catherine Vanaise"
+date: "1/25/2021"
+output: html_document
+---
+
+```{r}
+library(gsheet)
+dataUnido <- gsheet2tbl("https://docs.google.com/spreadsheets/d/1uLaXke-KPN28-ESPPoihk8TiXVWp5xuNGHW7w7yqLCc/edit#gid=416085055")
+```
+
+# Piping
+
+```{r}
+library(dplyr)
+dataUnido %>%
+  glimpse()
+```
+
+# Loading the dataset into a variable named gdpCountry
+
+```{r}
+library(readr)
+gdpCountry <- read_csv("./data/gdpCountry.csv")
+```
+
+# Loading the dataset into a variable named myData
+
+```{r}
+myData <- gsheet2tbl("https://docs.google.com/spreadsheets/d/1uLaXke-KPN28-ESPPoihk8TiXVWp5xuNGHW7w7yqLCc/edit#gid=416085055")
+```
+
+# Making a new column
+
+```{r}
+dataUnido$newColumn <- 42
+```
+
+# Show the columns' name
+
+```{r}
+colnames(dataUnido)
+```
+
+# Show the column newColumn
+
+```{r}
+head(dataUnido[,"newColumn"])
+```
+
+# Multiply by 2 and add 5
+
+```{r}
+dataUnido$newColumn <- dataUnido$newColumn * 2 + 5
+```
+
+# Show the column 'newColumn'
+
+```{r}
+head(dataUnido[,"newColumn"])
+```
+
+# Rename the newColumn
+
+```{r}
+library(dplyr)
+dataUnido <- dataUnido %>% 
+  dplyr::rename(newColumnRenamed = newColumn)
+colnames(dataUnido)
+```
+
+# Delete the column named 'newColumn'
+
+```{r}
+dataUnido$newColumnRenamed <- NULL
+# Show columns' name
+colnames(dataUnido)
+```
+
+# Erasing non important variables
+
+```{r}
+dataUnido$isicCodeCombinaison <- NULL
+dataUnido$tableDefinitionCode <- NULL
+dataUnido$sourceCode <- NULL
+dataUnido$updateYear <- NULL
+dataUnido$unit <- NULL
+```
+
+# Show columns' name
+
+```{r}
+colnames(dataUnido)
+```
+
+# Provide the dimension of the dataframe
+
+```{r}
+dim(dataUnido)
+```
+
+# Subset of dataUnido based on countryCode == Canada
+
+```{r}
+library(dplyr)
+dataUnidoCanada <- filter(dataUnido, countryCode == 124)
+```
+
+# First lines of the dataframe
+
+```{r}
+head(dataUnidoCanada)
+```
+
+# Number of columns & rows
+
+```{r}
+dim(dataUnidoCanada)
+```
+
+# Subset of dataUnidoCanada based on two variables (number of employees and establishments)
+
+```{r}
+dataUnidoCanadaVariables <- filter(dataUnidoCanada, tableCode == 4 | tableCode == 1)
+```
+
+# First lines of the dataframe
+
+```{r}
+head(dataUnidoCanadaVariables)
+```
+
+# Number of columns & rows
+
+```{r}
+dim(dataUnidoCanadaVariables)
+```
+
+# Subset of dataUnido based on countryCode == Canada
+
+```{r}
+dataUnidoCanadaVariablesAfter2009 <- filter(dataUnidoCanadaVariables, year > 2009)
+```
+
+# First lines of the dataframe
+
+```{r}
+head(dataUnidoCanadaVariablesAfter2009)
+```
+
+# Dimension of the dataframe
+
+```{r}
+dim(dataUnidoCanadaVariablesAfter2009)
+```
+
+# dataSorted will receive the dataframe dataUnidoCanadaVariablesAfter2009 sorted by the column value
+
+```{r}
+dataSorted <- arrange(dataUnidoCanadaVariablesAfter2009, value)
+```
+
+# first 6 lines of the dataset
+
+```{r}
+head(dataSorted)
+```
+
+# dataReverse is the opposite of dataSorted, i.e. the first lines will have the highest values
+
+```{r}
+dataReverse <- arrange(dataUnidoCanadaVariablesAfter2009, desc(value))
+```
+
+# first 6 lines of the dataset
+
+```{r}
+head(dataReverse)
+```
+
+# Using pivot_wider() to transform a long dataframe into a wide dataframe
+
+```{r}
+library(tidyr)
+wideData <- dataSorted %>%
+  pivot_wider(names_from = isicCode, values_from = value)
+head(wideData)
+```
+
+# Using pivot_longer() to transform from wide to long data
+
+```{r}
+longData <- wideData %>% 
+  pivot_longer(!c(year, tableCode, countryCode), names_to = "isicCode", values_to = "value")
+```
+
+# Dimension of the dataframe
+
+```{r}
+dim(longData)
+```
+
+# First 6 lines
+
+```{r}
+head(longData)
+```
+
+```{r}
+library(gsheet)
+dataUnido <- gsheet2tbl("https://docs.google.com/spreadsheets/d/1uLaXke-KPN28-ESPPoihk8TiXVWp5xuNGHW7w7yqLCc/edit#gid=416085055")
+dataUnido$isicCodeCombinaison <- NULL
+dataUnido$tableDefinitionCode <- NULL
+dataUnido$sourceCode <- NULL
+dataUnido$updateYear <- NULL
+dataUnido$unit <- NULL
+```
+
+# Dataset for dataCanada
+
+```{r}
+library(tidyverse)
+dataCanada131 <- filter(dataUnido, countryCode == 76)
+dataCanada131 <- filter(dataCanada131, isicCode == 131)
+dataCanada131 <- filter(dataCanada131, tableCode == 4)
+dataCanada131 <- filter(dataCanada131, year > 2008)
+dataCanada131 <- dataCanada131 %>%
+  pivot_wider(names_from = isicCode, values_from = value)
+head(dataCanada131)
+```
+
+# Dataset for dataCanada181
+
+```{r}
+dataCanada181 <- filter(dataUnido, countryCode == 76)
+dataCanada181 <- filter(dataCanada181, isicCode == 181)
+dataCanada181 <- filter(dataCanada181, tableCode == 4)
+dataCanada181 <- filter(dataCanada181, year > 2008)
+dataCanada181 <- dataCanada181 %>%
+  pivot_wider(names_from = isicCode, values_from = value)
+head(dataCanada181)
+```
+
+# Merging 2 datasets
+
+```{r}
+dataCanadaFull <- left_join(dataCanada131, dataCanada181, c("year","tableCode","countryCode"))
+head(dataCanadaFull)
+```
+
+# Transform dataCanadaFull in long data format
+
+```{r}
+dataCanadaFullLong <- dataCanadaFull %>% 
+  pivot_longer(!c(year, tableCode, countryCode), names_to = "isicCode", values_to = "value")
+```
+
