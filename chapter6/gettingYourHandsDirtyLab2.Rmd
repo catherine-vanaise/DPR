@@ -1,0 +1,91 @@
+---
+title: "Lab 2 Getting your hands dirty"
+author: "Catherine Vanaise"
+date: "1/27/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(readr)
+gdp <- read_csv("./data/chapter6data.csv")
+
+library(gsheet)
+locations <- gsheet2tbl("https://docs.google.com/spreadsheets/d/1nehKEBKTQx11LZuo5ZJFKTVS0p5y1ysMPSOSX_m8dS8/edit?usp=sharing")
+
+```
+
+```{r}
+library(dplyr)
+gdp$X1 <- NULL
+```
+
+```{r}
+gdp2 <- filter(gdp, country == "United States" | country == "Canada" | country == "Japan" | country == "Belgium" | country == "France")
+```
+
+```{r}
+library(tidyr)
+gdp3 <- gdp2 %>% 
+  pivot_longer(!c(country), names_to = "year", values_to = "gdp")
+```
+
+```{r}
+# Loading the gsheet package
+library(gsheet)
+# Read data from the URL
+dataUnido <- gsheet::gsheet2tbl("https://docs.google.com/spreadsheets/d/1uLaXke-KPN28-ESPPoihk8TiXVWp5xuNGHW7w7yqLCc/edit#gid=416085055")
+# erasing non important variables
+dataUnido$isicCodeCombinaison <- NULL
+dataUnido$tableDefinitionCode <- NULL
+dataUnido$sourceCode <- NULL
+dataUnido$updateYear <- NULL
+dataUnido$unit <- NULL
+```
+
+```{r}
+# Loading the dplyr package
+library(tidyverse)
+# Dataset for dataCanada
+dataCanada131 <- filter(dataUnido, countryCode == 76)
+dataCanada131 <- filter(dataCanada131, isicCode == 131)
+dataCanada131 <- filter(dataCanada131, tableCode == 4)
+dataCanada131 <- filter(dataCanada131, year > 2008)
+dataCanada131 <- dataCanada131 %>%
+  pivot_wider(names_from = isicCode, values_from = value)
+head(dataCanada131)
+```
+
+```{r}
+dataCanada181 <- filter(dataUnido, countryCode == 76)
+dataCanada181 <- filter(dataCanada181, isicCode == 181)
+dataCanada181 <- filter(dataCanada181, tableCode == 4)
+dataCanada181 <- filter(dataCanada181, year > 2008)
+dataCanada181 <- dataCanada181 %>%
+  pivot_wider(names_from = isicCode, values_from = value)
+head(dataCanada181)
+```
+
+```{r}
+dataCanadaFull <- left_join(dataCanada131, dataCanada181, c("year", "tableCode", "countryCode"))
+```
+
+```{r}
+dataCanadaFullLong <- dataCanadaFull %>% 
+  pivot_longer(!c(year, tableCode, countryCode), names_to = "isicCode", values_to = "value")
+```
+
+```{r}
+gdp4 <- left_join(gdp3, locations, "country")
+
+```
+
+```{r}
+# changing United states into USA
+
+locations$country <- gsub("United States", "USA", locations$country)
+```
+

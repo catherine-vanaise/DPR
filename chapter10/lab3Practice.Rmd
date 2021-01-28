@@ -1,0 +1,125 @@
+---
+title: "Lab3"
+author: "Catherine Vanaise"
+date: "1/27/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+dataCanadaFullLong <- readr::read_csv("./data/dataCanadaFullLong.csv")
+dataCanadaFullLong$isicCode <- as.character(dataCanadaFullLong$isicCode)
+```
+
+```{r}
+library(ggplot2)
+library(ggthemes)
+ggplot(data = dataCanadaFullLong, aes(x = year, y = value, fill = isicCode)) + 
+  geom_bar(stat = "identity", width = 0.5, position = "dodge") + 
+  xlab("") +
+  ylab("Number of employees")  +
+  labs(fill = "Isic Code")  +  
+  theme_minimal() + 
+  scale_fill_brewer(direction = -1)
+```
+
+```{r}
+# Line chart elements
+library(ggplot2)
+library(ggthemes)
+ggplot(data = dataCanadaFullLong, aes(x = year, y = value, color = isicCode)) +
+  geom_line(size = 1.5) +
+  xlab("") +
+  ylab("Number of employees")  +
+  labs(fill = "Isic Code")  +  
+  theme_minimal() +
+  scale_color_brewer(direction = -1)
+```
+
+```{r}
+ggplot(data = dataCanadaFullLong, aes(x = year, y = value, color = isicCode)) +
+  geom_line(size = 1.5) +
+  xlab("") +
+  ylab("Number of employees")  +
+  labs(fill = "Isic Code")  +  
+  theme_minimal() +
+  scale_color_brewer(direction = -1) + 
+  geom_point(size = 2.5)
+```
+
+```{r}
+# Bubble chart elements
+library(ggplot2)
+library(ggthemes)
+ggplot(data = dataCanadaFullLong, aes(x = year, y = value, color = isicCode)) +
+  geom_point(aes(size = value)) +
+  xlab("") +
+  ylab("Number of employees")  +
+  theme_minimal() +
+  scale_color_brewer(direction = -1) +
+  scale_size_continuous(range = c(3,11)) + 
+  guides(size = FALSE)
+```
+
+```{r}
+library(ggplot2)
+world <- map_data("world")
+```
+
+```{r}
+ggplot(data = world, aes(x = long, y = lat, group = group)) + 
+  geom_polygon(fill = "white", color = "black") +
+  theme_void()
+```
+
+```{r}
+# Retrieve data
+world <- map_data("world")
+americas <- subset(world, region %in% c("USA","Brazil","Mexico", "Colombia", "Argentina", "Canada",
+                                      "Peru","Venezuela","Chile","Guatemala","Ecuador", "Bolivia", "Cuba",
+                                      "Honduras", "Paraguay", "Nicaragua","El Salvador", "Costa Rica", "Panama",
+                                      "Uruguay",  "Jamaica",  "Trinidad and Tobago", "Guyana", "Suriname", "Belize",
+                                      "Barbados", "Saint Lucia", "Grenada", "Saint Vincent and the Grenadines", 
+                                      "Antigua and Barbuda", "Saint Kitts and Nevis"))
+# Create map
+ggplot(data = americas, aes(x = long, y = lat, group = group)) + 
+  geom_polygon(fill = "white", color = "black") +
+  coord_fixed(ratio=1.1, xlim = c(-180, -35))  + 
+  theme_void()
+```
+
+```{r}
+library(readr)
+gdp5 <- read_csv("./data/chapter10data.csv")
+
+ggplot(data = gdp5, aes(x = year, y = gdp, color = country)) +
+  geom_line(size = 0.5) +
+  xlab("Years") +
+  ylab("Gross domestic product")  +
+  labs(fill = "Country")  +  
+  theme_minimal() +
+  scale_color_brewer(direction = -1) + 
+  geom_point(size = 0.5)
+```
+
+```{r}
+library(dplyr)
+gdp6 <- filter(gdp5, year == 2017)
+```
+
+```{r}
+library(ggplot2)
+library(ggthemes)
+gdp6$country <- as.character(gdp6$country)
+ggplot(data = gdp6, aes(x = country, y = gdp, fill = country)) +
+  geom_bar(stat="identity",size = 1.5) +
+  xlab("") +
+  ylab("Gross domestic product")  +
+  labs(fill = "Country")  +  
+  theme_minimal() +
+  scale_fill_brewer(direction = 1) 
+```
+
